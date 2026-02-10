@@ -26,6 +26,20 @@ class PersonRepository{
             throw error;
         }
     }
+
+    async getPerson(name){
+        try {
+            // Finding user by name
+            const user=await Person.findOne({name: name});
+            
+            // If user doesnt exist
+            if(!user) return console.log('Person not found') ;
+            return user;
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
 }
 
 module.exports=new PersonRepository();
