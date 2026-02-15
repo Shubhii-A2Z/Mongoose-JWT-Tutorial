@@ -1,5 +1,4 @@
 const express=require('express');
-const bodyParser=require('body-parser');
 
 const { PORT } = require('./config/serverConfig');
 const connectToDB = require('./config/dbConfig');
@@ -7,7 +6,7 @@ const personRouter = require('./routes/personRouter');
 
 const app=express();
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 app.use('/person',personRouter);
 

@@ -1,4 +1,5 @@
 const mongoose=require('mongoose');
+const bcrypt=require('bcrypt');
 
 // Defining the person schema
 const personSchema=new mongoose.Schema({
@@ -22,8 +23,32 @@ const personSchema=new mongoose.Schema({
     email: {
         type: String,
         unique: true
-    } 
+    },
+
+    username: {
+        type:String,
+        required: [true,'Username is required']
+    },
+
+    password: {
+        type:String,
+        required: [true,'Password is required']
+    }
 });
+
+// pre('save', ...) middleware is triggered before the save operation on a Mongoose model instance.
+personSchema.pre('save',async function(){
+    const person=this;
+    if(!person.isModified('password')) return; // if the password field has been modified or is new, then only hash it
+    try {
+        const salt=await bcrypt.genSalt(10); // generating a salt: random string of characters
+        const hashPass=await bcrypt.hash(person.password,salt); // Hash the password with the salt
+        person.password=hashPass; // // replace the plain password with the hashed one
+        return;
+    } catch (error) {
+        return error;
+    }
+}); 
 
 // Creating the person model
 const Person=mongoose.model('Person',personSchema); 
