@@ -10,13 +10,11 @@ const personSchema=new mongoose.Schema({
 
     gender: {
         type: String,
-        enum: ['Male','Female'],
-        required: [true,'Gender cannot be empty']
+        // enum: ['Male','Female'],
     },
 
     mobile: {
         type: String,
-        required: [true,'Mobile cannot be empty'],
         unique: true
     },
 
@@ -27,7 +25,6 @@ const personSchema=new mongoose.Schema({
 
     username: {
         type:String,
-        required: [true,'Username is required']
     },
 
     password: {

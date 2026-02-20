@@ -5,6 +5,11 @@ const { generateToken } = require("../utils/jwt");
 
 async function addPerson(req,resp){
     try {
+        if(!req.body.name){
+            return resp.status(StatusCodes.BAD_REQUEST).json({
+                err: 'Enter required fields'
+            });
+        }
         const personData=req.body; // Assuming the req body contains person data
         const response=await PersonRepository.createPerson(personData);
 
@@ -20,6 +25,11 @@ async function addPerson(req,resp){
             Token: token
         });
     } catch (error) {
+        if(error.code==11000){ // Mongoose error for duplicate key
+            return resp.status(StatusCodes.BAD_REQUEST).json({
+                err: 'Duplicate Email'
+            });
+        }
         return resp.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             err: 'Internal Server Error'
         });
