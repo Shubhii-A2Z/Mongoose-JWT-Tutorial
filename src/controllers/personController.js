@@ -53,9 +53,19 @@ async function loginPerson(req,resp){
     try {
         // Extracting name and email from req body
         const {name,email}=req.body;
+        if(!name){
+            return resp.status(StatusCodes.BAD_REQUEST).json({
+                error: 'Please enter name'
+            });
+        }
 
         // Finding user by name
         const user=await PersonRepository.getPerson(name);
+        if(!user){
+            return resp.status(StatusCodes.UNAUTHORIZED).json({
+                error: 'User not found'
+            })
+        }
 
         // Generate token
         const payload={
@@ -64,7 +74,7 @@ async function loginPerson(req,resp){
         }
         const token=generateToken(payload);
 
-        return resp.json({
+        return resp.status(StatusCodes.ACCEPTED).json({
             Token: token
         });
     } catch (error) {

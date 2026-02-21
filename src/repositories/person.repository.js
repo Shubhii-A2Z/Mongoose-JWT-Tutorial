@@ -33,7 +33,7 @@ class PersonRepository{
             const user=await Person.findOne({name: name});
             
             // If user doesnt exist
-            if(!user) return console.log('Person not found') ;
+            if(!user) return null ;
             return user;
         } catch (error) {
             console.log(error);

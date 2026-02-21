@@ -1,4 +1,4 @@
-const { addPerson } = require("../src/controllers/personController");
+const { addPerson, loginPerson } = require("../src/controllers/personController");
 const personRepository = require("../src/repositories/person.repository");
 
 //
@@ -39,11 +39,16 @@ const mockUser={
     password: "12345678"
 };
 
+const userLogin={
+    name: "Test Name",
+    email: "test@gmail.com"
+};
 
 afterEach(()=>{
     // Restoring the mocks created with .spyOn() back to their original value
     console.log('After Each called');
 });
+
 
 describe('Register User',()=>{
 
@@ -88,9 +93,53 @@ describe('Register User',()=>{
 
         await addPerson(mockReq,mockResp);
 
-        expect(mockResp.status).toHaveBeenCalledWith(400)
+        expect(mockResp.status).toHaveBeenCalledWith(400);
         expect(mockResp.json).toHaveBeenCalledWith({
             err: 'Duplicate Email' 
+        });
+    });
+
+});
+
+
+describe('Login User',()=>{
+
+    it('should return missing name error',async ()=>{
+        const mockReq=mockRequest().body={body:{}};
+        const mockResp=mockResponse();
+
+        await loginPerson(mockReq,mockResp);
+
+        expect(mockResp.status).toHaveBeenCalledWith(400);
+        expect(mockResp.json).toHaveBeenCalledWith({
+            error: 'Please enter name'
+        });
+    });
+
+    it('should return invalid name error',async ()=>{
+        jest.spyOn(personRepository,"getPerson").mockResolvedValueOnce(null);
+        const mockReq=mockRequest().body={body:{...userLogin}};
+        const mockResp=mockResponse();
+        console.log(mockReq);
+
+        await loginPerson(mockReq,mockResp);
+
+        expect(mockResp.status).toHaveBeenCalledWith(401);
+        expect(mockResp.json).toHaveBeenCalledWith({
+            error: 'User not found'
+        });
+    });
+
+    it('should login user',async ()=>{
+        jest.spyOn(personRepository,"getPerson").mockResolvedValueOnce(mockUser);
+        const mockReq=mockRequest();
+        const mockResp=mockResponse();
+        
+        await loginPerson(mockReq,mockResp);
+
+        expect(mockResp.status).toHaveBeenCalledWith(202);
+        expect(mockResp.json).toHaveBeenCalledWith({
+            Token: 'jwt_token'
         });
     });
 
